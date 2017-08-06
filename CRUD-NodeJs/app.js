@@ -7,6 +7,24 @@ var bodyParser = require('body-parser');
 
 var index = require('./routes/routes');
 
+// Database
+var mysql = require("mysql");
+var con = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "tcc_node"
+});
+con.connect(function(err){
+  if(err)
+  {
+    console.log('Error connecting to DB');
+    return;
+  }
+  console.log('Connection established');
+});
+
+
 var app = express();
 
 // view engine setup
@@ -20,6 +38,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+//Make our DB accessible to our router
+app.use(function(req, res, next){
+  req.con = con;
+  next();
+});
 
 app.use('/', index);
 
